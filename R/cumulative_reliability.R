@@ -2,40 +2,72 @@
 
 #' @name cumulative_reliability
 #' @import tidyverse
-#' @examples
-#' cumulative_reliability(data, "response_time", id_var="id", time_var='studyday', timepoint_range = c(0,1))
 #' @export
-cumulative_reliability <- function(.data, varname, id_var="id", time_var='studyday', timepoint_range = c(0,1)) {
+cumulative_reliability <- function(.data,
+                                   varname=NULL,
+                                   formula_s=NULL,
+                                   id_var="id",
+                                   time_var='studyday',
+                                   timepoint_range = c(0,1),
+                                   avg_obs = NULL) {
+
   # set variable name to explore reliability ----
-    cur.varname = varname
+  if(is.null(varname) & is.null(formula_s)) {
+    stop("Either of `varname` or `formula_s` parameters are required")
+  }
 
-    # init storage of results ----
-    results <- tibble()
+  # init storage of results ----
+  results <- tibble()
 
-    # loop over time ----
-    for(timepoint in 1:timepoint_range[2]) {
+  # decompose ----
+  timepoint_min = timepoint_range[1]
+  timepoint_max = timepoint_range[2]
 
-      # filter data ----
-      timepoint_data <- .data %>%
-        filter(!!sym(cluster_var) >= timepoint_range[1] & !!sym(cluster_var) <= timepoint)
+  # loop over time ----
+  for(timepoint in timepoint_min:timepoint_max) {
 
-      # specify model ----
-      timepoint_fit <- lme(fixed= formula(paste0(cur.varname," ~ 1")),
-                     random= ~ 1|id,
-                     data=timepoint_data,
-                     na.action=na.exclude)
+    print(paste0("timepoint: 0 - ", timepoint))
 
-      # calculate reliability ----
-      reliability_results <- calc_reliability(day.fit,avg_obs(day.data, id_var=id_var))
+    # filter data ----
+    timepoint_data <- .data %>%
+      filter(!!sym(time_var) >= timepoint_min & !!sym(time_var) <= timepoint+1)
 
-      export_results <- tibble(reliability_results$reliability_summary$reliability_between_person) %>%
-        mutate(timepoint = timepoint,
-               outcome_variable = varname)
+    # specify model ----
+    if(is.null(formula_s)) {
+      formula_str = paste0(varname," ~ 1 + (1 |", id_var,")")
+    } else {
+      formula_str = formula_s
+    }
+    timepoint_fit <- lme4::lmer(formula = formula(formula_str),
+                                data = timepoint_data)
 
-      results <- bind_rows(results, export_results)
-
-      # clear to not have looping overwriting issues
+    # calculate avg number of obs
+    if(is.null(avg_obs)) {
+      obs_n_list = avg_obs(timepoint_data, id_var=id_var)
+      avg_obs_calc = obs_n_list$summary$mean_obs
+      avg_obs_supplied = F
+    } else {
+      avg_obs_calc = avg_obs
+      avg_obs_supplied = T
     }
 
-  return(reliability.data)
+    # calculate reliability ----
+    reliability_results <- calc_reliability(timepoint_fit, avg_obs_calc)
+
+    # create tidy export -----
+    export_results <- tibble(icc_adjusted = reliability_results$icc$icc_pkg_adjusted,
+                             icc_conditional = reliability_results$icc$icc_pkg_conditional,
+                             reliability_betweenperson = reliability_results$reliability_summary$reliability_between_person,
+                             formula = formula_str,
+                             timepoint = timepoint,
+                             min_timepoint = timepoint_range[1],
+                             max_timepoint = timepoint_range[2],
+                             outcome_variable = varname,
+                             avg_obs = avg_obs_calc,
+                             avg_obs_supplied = avg_obs_supplied)
+
+    # bind with rest of results ----
+    results <- bind_rows(results, export_results)
+  }
+  return(results)
 }

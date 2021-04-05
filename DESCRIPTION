@@ -8,3 +8,9 @@ Description: Reliability calculators of different kinds.
 License: MIT
 Encoding: UTF-8
 LazyData: true
+Depends: R (>= 4.0.0)
+Imports:
+    dplyr,
+    performance,
+    lme4,
+    reghelper
