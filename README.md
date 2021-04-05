@@ -47,7 +47,7 @@ rels <- relic::calc_reliability(fit, avg_obs = avg_obs_ss)
 # calculate cumulative reliability
 
 # simple unconditional model ----
-cum_rels <- relic::cumulative_reliability(ss,
+cumulative_rels <- relic::cumulative_reliability(ss,
                                    varname = "response_time",
                                    id_var="id",
                                    time_var="studyday",
@@ -56,7 +56,7 @@ cum_rels <- relic::cumulative_reliability(ss,
 # <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 
 # conditional models with custom formulas ----
-cum_rels_cf <- relic::cumulative_reliability(ss,
+cumulative_rels_cf <- relic::cumulative_reliability(ss,
                                           formula = "response_time ~ correct_response + studyday + (1|id)",
                                           id_var="id",
                                           time_var="studyday",

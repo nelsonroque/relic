@@ -15,7 +15,7 @@ library(tidyverse)
 # <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 
 # set data path ----
-data_path = "/Projects/EAS/closed_datasets/raw/EAS_Closed_Dataset_Version1_2020April (312B1)/Smartphone Survey and Cognitive Tests Data/"
+data_path = "~/Documents/Projects/EAS/closed_datasets/raw/EAS_Closed_Dataset_Version1_2020April (312B1)/Smartphone Survey and Cognitive Tests Data/"
 
 # load file -----
 ss <- read_sas(paste0(data_path, "b1clean_symbol_trial_26feb20.sas7bdat"), NULL)
@@ -39,16 +39,16 @@ rels <- relic::calc_reliability(fit, avg_obs = avg_obs_ss)
 # calculate cumulative reliability
 
 # simple unconditional model ----
-cum_rels <- relic::cumulative_reliability(ss,
+cumulative_rels <- relic::cumulative_reliability(ss,
                                    varname = "response_time",
                                    id_var="id",
                                    time_var="studyday",
-                                   timepoint_range = c(0,3))
+                                   timepoint_range = c(0,14))
 
 # <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 
 # conditional models with custom formulas ----
-cum_rels_cf <- relic::cumulative_reliability(ss,
+cumulative_rels_cf <- relic::cumulative_reliability(ss,
                                           formula = "response_time ~ correct_response + studyday + (1|id)",
                                           id_var="id",
                                           time_var="studyday",
