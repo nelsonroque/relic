@@ -30,7 +30,7 @@ cumulative_reliability <- function(.data,
 
     # filter data ----
     timepoint_data <- .data %>%
-      filter(!!sym(time_var) >= timepoint_min & !!sym(time_var) <= timepoint+1)
+      filter(!!sym(time_var) >= timepoint_min & !!sym(time_var) <= timepoint+1) # todo, think about removing equal in <=
 
     # specify model ----
     if(is.null(formula_s)) {
