@@ -1,8 +1,8 @@
 Package: relic
 Type: Package
 Title: Reliability calculators of different kinds.
-Version: 0.0.0001
-Author: Who wrote it
+Version: 0.0.0002
+Author: Nelson Roque, PhD <nelsonroquejr@gmail.com>
 Maintainer: Nelson Roque, PhD <nelsonroquejr@gmail.com>
 Description: Reliability calculators of different kinds.
 License: MIT

@@ -13,7 +13,7 @@ cumulative_reliability <- function(.data,
 
   # set variable name to explore reliability ----
   if(is.null(varname) & is.null(formula_s)) {
-    stop("Either of `varname` or `formula_s` parameters are required")
+    stop("Either of `varname` or `formula_s` parameters are required.")
   }
 
   # init storage of results ----
